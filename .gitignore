@@ -1,5 +1,14 @@
-dist
+# Environnement
+package-lock.json
+docker-compose.yml
 node_modules
-package-lock.json 
+.env
+
+# Prod
+dist
+
+# Others
 _logs
+_old
 secret.json
+*.7z

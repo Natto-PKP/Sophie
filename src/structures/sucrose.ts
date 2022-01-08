@@ -8,8 +8,8 @@ import { Logger } from './services/logger';
 import { EventManager } from './managers/events';
 import { InteractionManager } from './managers/interactions';
 
-/* Others */
-import { token } from '../secret.json';
+/* Typings */
+import { Params as CustomParams } from './typings/custom';
 
 /**
  * Sucrose client
@@ -18,13 +18,14 @@ export class Sucrose extends Client {
   public events: EventManager;
   public interactions: InteractionManager;
 
-  public constructor(options: ClientOptions) {
+  public constructor(options: ClientOptions, custom_params?: CustomParams) {
     super(options); // Give options to Client
 
-    this.events = new EventManager(this); // Attach new EventManager
-    this.interactions = new InteractionManager(this); // Attach new InteractionManager
+    custom_params = <CustomParams>custom_params;
+    this.events = new EventManager(this, { custom_params }); // Attach new EventManager
+    this.interactions = new InteractionManager(this, { custom_params }); // Attach new InteractionManager
 
-    this.login(token.canary); // Connect bot application to Discord API
+    this.login(process.env.TOKEN); // Connect bot application to Discord API
 
     this.build(); // Build this client
   }
@@ -33,6 +34,8 @@ export class Sucrose extends Client {
    * Build all managers
    */
   private async build(): Promise<void> {
+    const start = Date.now();
+
     /**
      * Fetch client application
      */
@@ -47,12 +50,12 @@ export class Sucrose extends Client {
 
         resolve();
       });
-    }); // [end] Fetch client application
+    }).catch(Logger.error); // [end] Fetch client application
 
-    await this.events.build().catch((errors) => Logger.handler(errors, 'EVENT_MANAGER')); // Build events
     await this.interactions.build().catch((errors) => Logger.handler(errors, 'INTERACTION_MANAGER')); // Build interactions
+    await this.events.build().catch((errors) => Logger.handler(errors, 'EVENT_MANAGER')); // Build events
 
     Logger.blank();
-    Logger.success(`${this.user?.tag} is online ! o7`);
+    Logger.success(`${this.user?.tag} is online ! o7 (${Date.now() - start} ms)`);
   } // [end] Build all managers
 } // [end] Sucrose client
