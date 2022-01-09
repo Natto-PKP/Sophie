@@ -3,8 +3,8 @@ import { v4 as UUIDV4 } from 'uuid';
 
 /* Models */
 import User from './user';
-import UserWallpaper from './wallpaper';
-import ItemWallpaper from '../items/wallpapers';
+import UserBackground from './background';
+import ItemWallpaper from '../items/wallpaper';
 
 /* Typings */
 import { Table, Column, Model, PrimaryKey, DataType, AllowNull, IsUUID, Default, ForeignKey, HasOne, HasMany, BelongsTo } from 'sequelize-typescript';
@@ -19,7 +19,7 @@ export type UserProfileModel = BaseEntity<{
   active_wallpaper_id: string;
 
   //? Others models
-  wallpapers: UserWallpaper[];
+  wallpapers: UserBackground[];
   wallpaper: ItemWallpaper;
 }>;
 
@@ -42,8 +42,8 @@ export default class UserProfile extends Model implements UserProfileModel {
   declare active_wallpaper_id: string;
 
   //? Others models
-  @HasMany(() => UserWallpaper, { foreignKey: 'profile_id' })
-  declare wallpapers: UserWallpaper[];
+  @HasMany(() => UserBackground, { foreignKey: 'profile_id' })
+  declare wallpapers: UserBackground[];
 
   @BelongsTo(() => ItemWallpaper, { foreignKey: 'active_wallpaper_id' })
   declare wallpaper: ItemWallpaper;

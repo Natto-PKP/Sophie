@@ -5,7 +5,7 @@ import { v4 as UUIDV4 } from 'uuid';
 import UserExperience from './experience';
 import UserEconomie from './economie';
 import UserProfile from './profile';
-import Item from '../items/global';
+import UserIndexe from './indexe';
 
 /* Typings */
 import { Table, Column, Model, PrimaryKey, DataType, AllowNull, IsUUID, Default, HasOne, HasMany } from 'sequelize-typescript';
@@ -21,7 +21,7 @@ export type UserModel = BaseEntity<{
   experience: UserExperience;
   economie: UserEconomie;
   profile: UserProfile;
-  items: Item[];
+  indexes: UserIndexe[];
 }>;
 
 @Table({ tableName: 'users', schema: 'users' })
@@ -51,6 +51,6 @@ export default class User extends Model implements UserModel {
   @HasOne(() => UserProfile, { foreignKey: 'user_id' })
   declare profile: UserProfile;
 
-  @HasMany(() => Item, { foreignKey: 'user_id' })
-  declare items: Item[];
+  @HasMany(() => UserIndexe, { foreignKey: 'user_id' })
+  declare indexes: UserIndexe[];
 }

@@ -2,14 +2,14 @@
 import { v4 as UUIDV4 } from 'uuid';
 
 /* Models */
-import ItemWallpaper from '../items/wallpapers';
+import ItemWallpaper from '../items/wallpaper';
 import UserProfile from './profile';
 
 /* Typings */
 import { Table, Column, Model, PrimaryKey, DataType, IsUUID, Default, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { BaseEntity } from '../../structures/typings/custom';
 
-export type UserWallpaperModel = BaseEntity<{
+export type UserBackgroundModel = BaseEntity<{
   //? Columns
   id: string;
 
@@ -22,7 +22,7 @@ export type UserWallpaperModel = BaseEntity<{
 }>;
 
 @Table({ tableName: 'backgrounds', schema: 'users' })
-export default class UserWallpaper extends Model implements UserWallpaperModel {
+export default class UserBackground extends Model implements UserBackgroundModel {
   //? Columns
   @PrimaryKey
   @IsUUID(4)
