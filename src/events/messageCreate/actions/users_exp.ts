@@ -1,5 +1,7 @@
 /* Models */
 import User from '../../../models/users/user';
+import UserExperience from '../../../models/users/experience';
+import UserEconomie from '../../../models/users/economie';
 
 /* Typings */
 import { Params } from 'src/structures/typings';
@@ -11,6 +13,7 @@ export const config = {
 
   /**
    * Get random exp
+   * @returns { number }
    */
   getMessageExp: () => {
     const weekend = [0, 6].includes(new Date().getDay());
@@ -19,27 +22,39 @@ export const config = {
 
   /**
    * Get total exp for next level
-   * @param level
+   * @param { number } level
+   * @returns { number }
    */
   getLevelExp: (level: number) => {
-    return level === 0 ? Math.ceil(config.exp_per_level / 2) : Math.ceil(level * config.exp_per_level * config.exp_multiplicator);
+    if (level === 0) return Math.ceil(config.exp_per_level / 2);
+    else return Math.ceil(level * config.exp_per_level * config.exp_multiplicator);
   },
 };
 
 /* cooldowns cache */
 export const cooldowns: { [key: string]: number } = {};
 
-export default async ({ args: [message] }: Params<'messageCreate'>) => {
-  // const id = message.author.id;
-  // if (cooldowns[id] && cooldowns[id] > Date.now()) return;
-  // const random = config.getMessageExp();
-  // const limit = config.getLevelExp(user.level);
-  // if (user.points + random >= limit) {
-  //   user.points = user.points + random - limit;
-  //   user.level += 1;
-  //   await message.react('♥️');
-  // } else user.points += random;
-  // cooldowns[id] = Date.now() + 2500;
+export default async ({ args: [message] }: Params<'messageCreate'>): Promise<void> => {
+  const discord_id = message.author.id;
+  const [user] = await User.findOrBuild({
+    where: { discord_id },
+    include: [UserExperience, UserEconomie],
+    defaults: { discord_id, experience: {}, economie: {} },
+  });
+
+  if (cooldowns[discord_id] && cooldowns[discord_id] > Date.now()) return;
+  const random = config.getMessageExp();
+  const limit = config.getLevelExp(user.experience.level);
+
+  if (user.experience.points + random >= limit) {
+    if (user.experience.level % 2 === 0) user.economie.tickets += 1;
+    user.experience.points = user.experience.points + random - limit;
+    user.experience.level += 1;
+    await message.react('♥️');
+  } else user.experience.points += random;
+
+  cooldowns[discord_id] = Date.now() + 2500;
+  await user.save();
 };
 
 //! Clean cache
